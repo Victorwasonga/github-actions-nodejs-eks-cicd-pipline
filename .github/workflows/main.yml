@@ -45,13 +45,13 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          echo "Building Docker image..."
-          docker build -t my-node-app:latest .
+          docker build -t actions-app:${{ github.sha }}:latest .
+          docker build -t actions-app:${{ github.sha }} ${{ secretes.ECR_REPOSITORY_URI }}/actions-cicd:latest
 
       - name: Scan Docker Image with Trivy
         run: |
           echo "Scanning Docker image with Trivy..."
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image my-node-app:latest
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image actions-app:${{ github.sha }}
 
       # Set up AWS Credentials
       - name: Configure AWS Credentials
@@ -66,3 +66,12 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY_URI }}
 
+      # Push Image to Amazon ECR
+      - name: push image to Amazon env
+        run: |
+          docker push ${{ secretes.ECR_REPOSITORY_URI }}/actions-cicd:latest
+        env:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRETE_ACCESS_KEY}}
+          aws-region: ${{secrets.AWS_REGION}}
+          
