@@ -32,7 +32,7 @@ jobs:
           echo "Installing dependencies..."
           npm install
 
-# Build and scan image with trivy
+# Build, Scan, Tag, and Push Image to Amazon ECR
   build_and_scan:
     runs-on: ubuntu-latest
     needs: install_dependencies
@@ -45,33 +45,42 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t actions-app:${{ github.sha }}:latest .
-          docker build -t actions-app:${{ github.sha }} ${{ secretes.ECR_REPOSITORY_URI }}/actions-cicd:latest
+          echo "Building Docker image..."
+          docker build -t my-node-app:latest .
 
       - name: Scan Docker Image with Trivy
         run: |
           echo "Scanning Docker image with Trivy..."
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image actions-app:${{ github.sha }}
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image my-node-app:latest
 
       # Set up AWS Credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws-secret-access-key: ${{secrets.AWS_SECRETE_ACCESS_KEY}}
-          aws-region: ${{secrets.AWS_REGION}}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRETE_ACCESS_KEY }}  # Fixed Typo
+          aws-region: ${{ secrets.AWS_REGION }}
 
       # Log in to Amazon ECR
       - name: Log in to Amazon ECR
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY_URI }}
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 711387133889.dkr.ecr.us-east-1.amazonaws.com
+          echo "ECR Login successful!"
+
+      # Tag Docker Image
+      - name: Tag Docker Image
+        run: |
+          ECR_REPO="711387133889.dkr.ecr.us-east-1.amazonaws.com/actions-cicd"
+          echo "Tagging Docker image..."
+          docker tag my-node-app:latest $ECR_REPO:latest
+
+      # Verify Local Docker Images
+      - name: Verify Local Docker Images
+        run: docker images
 
       # Push Image to Amazon ECR
-      - name: push image to Amazon env
+      - name: Push Image to Amazon ECR
         run: |
-          docker push ${{ secretes.ECR_REPOSITORY_URI }}/actions-cicd:latest
-        env:
-          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws-secret-access-key: ${{secrets.AWS_SECRETE_ACCESS_KEY}}
-          aws-region: ${{secrets.AWS_REGION}}
-          
+          ECR_REPO="711387133889.dkr.ecr.us-east-1.amazonaws.com/actions-cicd"
+          echo "Pushing Docker image to Amazon ECR..."
+          docker push $ECR_REPO:latest
