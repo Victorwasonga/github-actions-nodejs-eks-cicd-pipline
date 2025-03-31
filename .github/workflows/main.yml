@@ -48,7 +48,7 @@ jobs:
           echo "Building Docker image..."
           docker build -t my-node-app:latest .
 
-  # 4. Scan the Docker image with Trivy (using Docker image)
+  # 4. Scan the Docker image with Trivy
   trivy_scan:
     runs-on: ubuntu-latest
     needs: build_image
@@ -56,10 +56,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Install Trivy
+        run: |
+          echo "Installing Trivy..."
+          curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.29.0/trivy_0.29.0_Linux-64bit.deb -o trivy.deb
+          sudo dpkg -i trivy.deb
+          sudo apt-get install -f
+
       - name: Scan Docker Image with Trivy
         run: |
           echo "Scanning Docker image with Trivy..."
-          docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v $(pwd):/project \
-            aquasec/trivy:latest -q --exit-code 1 --image my-node-app:latest
+          trivy image my-node-app:lates
