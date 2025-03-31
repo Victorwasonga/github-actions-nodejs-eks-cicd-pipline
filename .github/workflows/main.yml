@@ -94,7 +94,7 @@ jobs:
           echo "Tagging image for Docker Hub..."
           docker tag my-node-app:latest $DOCKER_REPO:latest
 
-      # Push Image to Docker Hub
+      # Push Image to Docker hub repo
       - name: Push Image to Docker Hub
         run: |
           DOCKER_REPO="${{ secrets.DOCKER_USERNAME }}/my-node-app"
