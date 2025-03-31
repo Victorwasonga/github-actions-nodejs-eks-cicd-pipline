@@ -65,3 +65,12 @@ jobs:
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY_URI }}
+
+      # Push image to Amazon ECR
+      - name: Push image to Amazon ECR
+        run: |
+          docker push ${{ secrets.ECR_REPOSITORY_URI}}/actions-cicd:latest
+        env:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRETE_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
