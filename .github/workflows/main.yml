@@ -48,18 +48,18 @@ jobs:
           echo "Building Docker image..."
           docker build -t my-node-app:latest .
 
-# 4. Scan the Docker image with Trivy (using Docker image)
-trivy_scan:
-  runs-on: ubuntu-latest
-  needs: build_image
-  steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+  # 4. Scan the Docker image with Trivy (using Docker image)
+  trivy_scan:
+    runs-on: ubuntu-latest
+    needs: build_image
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Scan Docker Image with Trivy
-      run: |
-        echo "Scanning Docker image with Trivy..."
-        docker run --rm \
-          -v /var/run/docker.sock:/var/run/docker.sock \
-          -v $(pwd):/project \
-          aquasec/trivy:latest -q --exit-code 1 --image my-node-app:latest
+      - name: Scan Docker Image with Trivy
+        run: |
+          echo "Scanning Docker image with Trivy..."
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v $(pwd):/project \
+            aquasec/trivy:latest -q --exit-code 1 --image my-node-app:latest
