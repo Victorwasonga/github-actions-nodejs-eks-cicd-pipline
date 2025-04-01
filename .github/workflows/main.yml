@@ -61,23 +61,51 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRETE_ACCESS_KEY }}  # Fixed Typo
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Log in to Amazon ECR
+    
+
+      # ✅ Login to Amazon ECR
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 711387133889.dkr.ecr.us-east-1.amazonaws.com
-          echo "ECR Login successful!"
+          echo "✅ ECR Login successful!"
 
-      # Tag Docker Image
-      - name: Tag Docker Image
+      # 🏷️ Tag Docker Image for Amazon ECR
+      - name: Tag Docker Image for Amazon ECR
         run: |
           ECR_REPO="711387133889.dkr.ecr.us-east-1.amazonaws.com/actions-cicd"
-          echo "Tagging Docker image..."
+          echo "🏷️ Tagging Docker image for Amazon ECR..."
           docker tag my-node-app:latest $ECR_REPO:latest
 
-      # Verify Local Docker Images
+      # 📌 Verify Local Docker Images
       - name: Verify Local Docker Images
         run: docker images
 
+      # 📤 Push Image to Amazon ECR
+      - name: Push Image to Amazon ECR
+        run: |
+          ECR_REPO="711387133889.dkr.ecr.us-east-1.amazonaws.com/actions-cicd"
+          echo "📤 Pushing Docker image to Amazon ECR..."
+          docker push $ECR_REPO:latest
+
+      # ✅ Login to Docker Hub
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          echo "✅ Docker Hub login successful!"
+
+      # 🏷️ Tag Docker Image for Docker Hub
+      - name: Tag Docker Image for Docker Hub
+        run: |
+          DOCKER_REPO="${{ secrets.DOCKER_USERNAME }}/my-node-app"
+          echo "🏷️ Tagging Docker image for Docker Hub..."
+          docker tag my-node-app:latest $DOCKER_REPO:latest
+
+      # 📤 Push Image to Docker Hub
+      - name: Push Image to Docker Hub
+        run: |
+          DOCKER_REPO="${{ secrets.DOCKER_USERNAME }}/my-node-app"
+          echo "📤 Pushing Docker image to Docker Hub..."
+          docker push $DOCKER_REPO:latest
       # Push Image to Amazon ECR
       - name: Push Image to Amazon ECR
         run: |
