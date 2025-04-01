@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: nodejs-app
-          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-node-app:latest # Replace with your ECR repo
+          image: 711387133889.dkr.ecr.us-east-1.amazonaws.com/actions-cicd # Replace with your ECR repo
           ports:
             - containerPort: 3000
