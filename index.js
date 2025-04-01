@@ -4,7 +4,7 @@ const app = express();
 const PORT = 3000;
 
 app.get('/', (req, res) => {
-    res.send('Hello, World! Application deployed to EKS through CI/CD pipeline 🚀');
+    res.send('Hello, World! Application deployed to EKS through CI/CD pipeline using github actions workflow🚀');
 });
 
 app.listen(PORT, () => {
