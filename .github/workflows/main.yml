@@ -66,13 +66,13 @@ jobs:
       # ✅ Login to Amazon ECR
       - name: Log in to Amazon ECR
         run: |
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 711387133889.dkr.ecr.us-east-1.amazonaws.com
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrete.ECR_REPOSITORY_URI }}
           echo "✅ ECR Login successful!"
 
       # 🏷️ Tag Docker Image for Amazon ECR
       - name: Tag Docker Image for Amazon ECR
         run: |
-          ECR_REPO="711387133889.dkr.ecr.us-east-1.amazonaws.com/actions-cicd"
+          ECR_REPO="${{ secrete.ECR_REPOSITORY_URI }}/actions-cicd"
           echo "🏷️ Tagging Docker image for Amazon ECR..."
           docker tag my-node-app:latest $ECR_REPO:latest
 
@@ -83,7 +83,7 @@ jobs:
       # 📤 Push Image to Amazon ECR
       - name: Push Image to Amazon ECR
         run: |
-          ECR_REPO="711387133889.dkr.ecr.us-east-1.amazonaws.com/actions-cicd"
+          ECR_REPO="${{ secrete.ECR_REPOSITORY_URI }}/actions-cicd"
           echo "📤 Pushing Docker image to Amazon ECR..."
           docker push $ECR_REPO:latest
 
@@ -109,6 +109,6 @@ jobs:
       # Push Image to Amazon ECR
       - name: Push Image to Amazon ECR
         run: |
-          ECR_REPO="711387133889.dkr.ecr.us-east-1.amazonaws.com/actions-cicd"
+          ECR_REPO="${{ secrete.ECR_REPOSITORY_URI }}/actions-cicd"
           echo "Pushing Docker image to Amazon ECR..."
           docker push $ECR_REPO:latest
