@@ -133,17 +133,8 @@ jobs:
       # Deploy to Amazon EKS
       - name: Deploy to EKS
         run: |
-          # Update the kubeconfig to access EKS
-          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name actions-eks-cluster
-
-          # Set the image tag dynamically using the Git commit hash (Optional)
-          IMAGE_TAG=$(git rev-parse --short HEAD)
-
-          # Update the Kubernetes Deployment with the new image
-          kubectl set image deployment/nodejs-app nodejs-app=711387133889.dkr.ecr.us-east-1.amazonaws.com/my-node-app:${IMAGE_TAG} --record
-
-          # Rollout restart to make sure pods are replaced with the latest image
-          kubectl rollout restart deployment nodejs-app
+          kubectl apply -f manifests/deployment.yaml
+          kubectl apply -f manifests/service.yaml
 
       # Verify Deployment Status
       - name: Verify Deployment
@@ -151,8 +142,3 @@ jobs:
           echo "Waiting for pods to be in a running state..."
           kubectl rollout status deployment/nodejs-app
           kubectl get pods -o wide
-
-      # Optionally, wait until the new pods are running before continuing
-      - name: Wait for Pods to Be Ready
-        run: |
-          kubectl wait --for=condition=available --timeout=600s deployment/nodejs-app
