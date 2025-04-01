@@ -305,5 +305,3 @@ After the deployment is complete, your application will be exposed through an **
 
 This project demonstrates a modern, fully automated CI/CD pipeline using GitHub Actions, Docker, Trivy, ECR, and EKS for deploying a secure and scalable Node.js application. It ensures that every change is automatically built, scanned for vulnerabilities, pushed to container registries, and deployed to AWS with minimal manual intervention.
 ```
-
-This `README.md` file outlines your project and walks users through the setup, configuration, and usage of your pipeline. It provides the necessary instructions, from setting up prerequisites to deploying the application, ensuring that the process is clear for both developers and system administrators.
